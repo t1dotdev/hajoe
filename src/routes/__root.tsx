@@ -1,4 +1,9 @@
-import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import {
+	createRootRoute,
+	HeadContent,
+	Link,
+	Scripts,
+} from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import appCss from "../styles.css?url";
 
@@ -27,6 +32,22 @@ export const Route = createRootRoute({
 		],
 	}),
 	shellComponent: RootDocument,
+	notFoundComponent: () => (
+		<main className="grid min-h-svh place-items-center px-6 text-center">
+			<div>
+				<h1 className="text-2xl font-bold">ไม่พบหน้านี้</h1>
+				<p className="mt-2 text-muted-foreground">
+					ลิงก์อาจพิมพ์ผิด หรือร้านนี้ถูกปิดไปแล้ว
+				</p>
+				<Link
+					to="/"
+					className="mt-6 inline-block font-medium underline underline-offset-4"
+				>
+					กลับหน้าแรก
+				</Link>
+			</div>
+		</main>
+	),
 });
 
 function RootDocument({ children }: { children: ReactNode }) {

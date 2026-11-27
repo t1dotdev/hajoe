@@ -10,33 +10,128 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ApiHitRouteImport } from './routes/api/hit'
+import { Route as ApiUploadRouteImport } from './routes/api/upload'
+import { Route as DemoSplatRouteImport } from './routes/demo/$'
+import { Route as MSlugRouteImport } from './routes/m/$slug'
+import { Route as SSlugRouteImport } from './routes/s/$slug'
+import { Route as USplatRouteImport } from './routes/u/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHitRoute = ApiHitRouteImport.update({
+  id: '/api/hit',
+  path: '/api/hit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUploadRoute = ApiUploadRouteImport.update({
+  id: '/api/upload',
+  path: '/api/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoSplatRoute = DemoSplatRouteImport.update({
+  id: '/demo/$',
+  path: '/demo/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MSlugRoute = MSlugRouteImport.update({
+  id: '/m/$slug',
+  path: '/m/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SSlugRoute = SSlugRouteImport.update({
+  id: '/s/$slug',
+  path: '/s/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const USplatRoute = USplatRouteImport.update({
+  id: '/u/$',
+  path: '/u/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/api/hit': typeof ApiHitRoute
+  '/api/upload': typeof ApiUploadRoute
+  '/demo/$': typeof DemoSplatRoute
+  '/m/$slug': typeof MSlugRoute
+  '/s/$slug': typeof SSlugRoute
+  '/u/$': typeof USplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/api/hit': typeof ApiHitRoute
+  '/api/upload': typeof ApiUploadRoute
+  '/demo/$': typeof DemoSplatRoute
+  '/m/$slug': typeof MSlugRoute
+  '/s/$slug': typeof SSlugRoute
+  '/u/$': typeof USplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/api/hit': typeof ApiHitRoute
+  '/api/upload': typeof ApiUploadRoute
+  '/demo/$': typeof DemoSplatRoute
+  '/m/$slug': typeof MSlugRoute
+  '/s/$slug': typeof SSlugRoute
+  '/u/$': typeof USplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/api/hit'
+    | '/api/upload'
+    | '/demo/$'
+    | '/m/$slug'
+    | '/s/$slug'
+    | '/u/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/api/hit'
+    | '/api/upload'
+    | '/demo/$'
+    | '/m/$slug'
+    | '/s/$slug'
+    | '/u/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/api/hit'
+    | '/api/upload'
+    | '/demo/$'
+    | '/m/$slug'
+    | '/s/$slug'
+    | '/u/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  ApiHitRoute: typeof ApiHitRoute
+  ApiUploadRoute: typeof ApiUploadRoute
+  DemoSplatRoute: typeof DemoSplatRoute
+  MSlugRoute: typeof MSlugRoute
+  SSlugRoute: typeof SSlugRoute
+  USplatRoute: typeof USplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +143,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/hit': {
+      id: '/api/hit'
+      path: '/api/hit'
+      fullPath: '/api/hit'
+      preLoaderRoute: typeof ApiHitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/upload': {
+      id: '/api/upload'
+      path: '/api/upload'
+      fullPath: '/api/upload'
+      preLoaderRoute: typeof ApiUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/$': {
+      id: '/demo/$'
+      path: '/demo/$'
+      fullPath: '/demo/$'
+      preLoaderRoute: typeof DemoSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/m/$slug': {
+      id: '/m/$slug'
+      path: '/m/$slug'
+      fullPath: '/m/$slug'
+      preLoaderRoute: typeof MSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s/$slug': {
+      id: '/s/$slug'
+      path: '/s/$slug'
+      fullPath: '/s/$slug'
+      preLoaderRoute: typeof SSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/u/$': {
+      id: '/u/$'
+      path: '/u/$'
+      fullPath: '/u/$'
+      preLoaderRoute: typeof USplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  ApiHitRoute: ApiHitRoute,
+  ApiUploadRoute: ApiUploadRoute,
+  DemoSplatRoute: DemoSplatRoute,
+  MSlugRoute: MSlugRoute,
+  SSlugRoute: SSlugRoute,
+  USplatRoute: USplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -17,3 +17,5 @@ export const promo = {
 	endsAt: "2026-12-31T23:59:59+07:00",
 	endsLabel: "31 ธ.ค. 2569",
 };
+
+export const siteUrl = "https://hajoe.topone.dev";

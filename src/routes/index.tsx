@@ -129,14 +129,14 @@ const features = [
 
 const examples = [
 	{
-		href: "/demo/cafe/",
+		href: "/s/demo-cafe",
 		img: "/demo/img/cafe-latte.jpg",
 		alt: "หน้าเว็บตัวอย่างคาเฟ่ นกฮูกตื่นเช้า",
 		name: "นกฮูกตื่นเช้า",
 		desc: "คาเฟ่ เมนูพร้อมราคา สถานะเปิด–ปิด แผนที่",
 	},
 	{
-		href: "/demo/spa/",
+		href: "/s/demo-spa",
 		img: "/demo/img/spa-aroma.webp",
 		alt: "หน้าเว็บตัวอย่างร้านนวด บ้านจำปี",
 		name: "บ้านจำปี นวดไทย",
