@@ -6,6 +6,7 @@ import { dailyStats, shops } from "@/db/schema";
 import { cleanShop, SLUG, shopErrors } from "@/lib/shop";
 import { bangkokDay } from "@/lib/stats";
 import { hashToken, isAdmin, newToken, tokenMatches } from "./token.ts";
+import { removeShopUploads } from "./uploads.ts";
 
 const asSlug = (v: unknown) => {
 	if (typeof v !== "string" || !SLUG.test(v)) throw new Error("bad slug");
@@ -170,4 +171,22 @@ export const adminResetOwnerLink = createServerFn({ method: "POST" })
 			.returning({ slug: shops.slug });
 		if (!updated.length) throw new Error("not found");
 		return { token };
+	});
+
+// Removes the shop, its stats (FK cascade) and its uploaded photos. Cannot be undone.
+// Demo shops (demo-cafe, demo-spa) are re-seeded on the next server start.
+export const adminDeleteShop = createServerFn({ method: "POST" })
+	.validator((d: AdminInput & { slug: string }) => d)
+	.handler(async ({ data }) => {
+		adminOnly(data?.k);
+		const slug = asSlug(data.slug);
+		const db = await getDb();
+		const deleted = await db
+			.delete(shops)
+			.where(eq(shops.slug, slug))
+			.returning({ slug: shops.slug });
+		if (!deleted.length) throw new Error("not found");
+		// DB row goes first: if file removal fails we only leave unused photos, never a page with broken images
+		await removeShopUploads(slug);
+		return { ok: true as const };
 	});

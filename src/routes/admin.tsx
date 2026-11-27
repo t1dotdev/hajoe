@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	adminCreateShop,
+	adminDeleteShop,
 	adminListShops,
 	adminResetOwnerLink,
 } from "@/server/shops";
@@ -70,6 +71,9 @@ function AdminPanel({ shops }: { shops: ShopList }) {
 		{},
 	);
 	const [links, setLinks] = useState<Record<string, string>>({});
+	const [confirming, setConfirming] = useState<string | null>(null);
+	const [deleting, setDeleting] = useState(false);
+	const [deleteError, setDeleteError] = useState("");
 
 	const create = async () => {
 		const res = await adminCreateShop({ data: { k, slug, json } }).catch(
@@ -82,6 +86,20 @@ function AdminPanel({ shops }: { shops: ShopList }) {
 			setResult({ link: ownerLink(slug, res.token) });
 			router.invalidate();
 		} else setResult({ errors: res.errors });
+	};
+
+	const remove = async (s: string) => {
+		setDeleting(true);
+		setDeleteError("");
+		try {
+			await adminDeleteShop({ data: { k, slug: s } });
+			setConfirming(null);
+			await router.invalidate();
+		} catch (e) {
+			setDeleteError((e as Error).message || "ลบไม่สำเร็จ");
+		} finally {
+			setDeleting(false);
+		}
 	};
 
 	const reset = async (s: string) => {
@@ -117,7 +135,46 @@ function AdminPanel({ shops }: { shops: ShopList }) {
 								>
 									ลิงก์เจ้าของใหม่
 								</Button>
+								<Button
+									variant="destructive"
+									size="xs"
+									onClick={() => {
+										setConfirming(s.slug);
+										setDeleteError("");
+									}}
+								>
+									ลบร้าน
+								</Button>
 							</div>
+							{confirming === s.slug && (
+								<div className="grid gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 p-3 text-sm">
+									<p>
+										ลบ <b>{s.name}</b> ถาวร? หน้าร้าน /s/{s.slug} สถิติ
+										และรูปที่อัปโหลดทั้งหมดจะหายไป กู้คืนไม่ได้
+									</p>
+									{deleteError && (
+										<p className="text-destructive">{deleteError}</p>
+									)}
+									<div className="flex gap-2">
+										<Button
+											variant="destructive"
+											size="sm"
+											disabled={deleting}
+											onClick={() => remove(s.slug)}
+										>
+											{deleting ? "กำลังลบ" : "ลบถาวร"}
+										</Button>
+										<Button
+											variant="outline"
+											size="sm"
+											disabled={deleting}
+											onClick={() => setConfirming(null)}
+										>
+											ยกเลิก
+										</Button>
+									</div>
+								</div>
+							)}
 							{links[s.slug] && (
 								<p className="text-xs break-all">
 									ส่งลิงก์นี้ให้เจ้าของร้านทาง LINE (ลิงก์เก่าใช้ไม่ได้แล้ว):{" "}

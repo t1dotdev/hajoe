@@ -1,5 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import { SLUG } from "../lib/shop.ts";
 import { newToken } from "./token.ts";
 
 export const uploadDir = () =>
@@ -28,3 +29,11 @@ export async function saveUpload(slug: string, bytes: Uint8Array, ext: string) {
 
 export const UPLOAD_PATH = /^([a-z0-9-]+)\/([A-Za-z0-9_-]+)\.(jpg|png|webp)$/;
 export const readUpload = (path: string) => readFile(join(uploadDir(), path));
+
+// Deletes every photo a shop uploaded. The slug check keeps the path inside the upload dir.
+export async function removeShopUploads(slug: string) {
+	if (!SLUG.test(slug)) throw new Error("bad slug");
+	const dir = join(uploadDir(), slug);
+	await rm(dir, { recursive: true, force: true });
+	return dir;
+}
