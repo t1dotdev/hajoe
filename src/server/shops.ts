@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { setResponseStatus } from "@tanstack/react-start/server";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { dailyStats, shops } from "@/db/schema";
@@ -24,6 +25,13 @@ async function ownerRow(slug: string, k: unknown) {
 	return row;
 }
 
+// Page loaders return this instead of throwing, so the page renders its friendly message with a 403
+// (a thrown error would make the SSR response a 500)
+const forbidden = () => {
+	setResponseStatus(403);
+	return { ok: false as const };
+};
+
 export const getShop = createServerFn({ method: "GET" })
 	.validator((slug: string) => asSlug(slug))
 	.handler(async ({ data: slug }) => (await shopRow(slug))?.data ?? null);
@@ -35,9 +43,14 @@ const ownerInput = (d: OwnerInput) => ({
 });
 
 export const getOwnerDashboard = createServerFn({ method: "POST" })
-	.validator(ownerInput)
+	.validator((d: OwnerInput) => ({
+		slug: String(d?.slug ?? ""),
+		k: String(d?.k ?? ""),
+	}))
 	.handler(async ({ data }) => {
-		const row = await ownerRow(data.slug, data.k);
+		if (!SLUG.test(data.slug)) return forbidden();
+		const row = await shopRow(data.slug);
+		if (!row || !tokenMatches(data.k, row.ownerTokenHash)) return forbidden();
 		const db = await getDb();
 		const today = bangkokDay(new Date());
 		const rows = await db
@@ -54,6 +67,7 @@ export const getOwnerDashboard = createServerFn({ method: "POST" })
 				),
 			);
 		return {
+			ok: true as const,
 			shop: row.data,
 			rows,
 			today,
@@ -93,7 +107,7 @@ const adminOnly = (k: unknown) => {
 export const adminListShops = createServerFn({ method: "POST" })
 	.validator((d: AdminInput) => d)
 	.handler(async ({ data }) => {
-		adminOnly(data?.k);
+		if (!isAdmin(data?.k)) return forbidden();
 		const db = await getDb();
 		const rows = await db
 			.select({
@@ -103,12 +117,15 @@ export const adminListShops = createServerFn({ method: "POST" })
 			})
 			.from(shops)
 			.orderBy(shops.createdAt);
-		return rows.map((r) => ({
-			slug: r.slug,
-			name: r.data.name,
-			demo: !!r.data.demo,
-			updatedAt: r.updatedAt.toISOString(),
-		}));
+		return {
+			ok: true as const,
+			shops: rows.map((r) => ({
+				slug: r.slug,
+				name: r.data.name,
+				demo: !!r.data.demo,
+				updatedAt: r.updatedAt.toISOString(),
+			})),
+		};
 	});
 
 // Creates a shop from JSON (shops/*.json format) and returns its new owner token

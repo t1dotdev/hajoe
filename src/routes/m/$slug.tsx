@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
+import { Forbidden } from "@/components/forbidden";
 import { ShopEditor } from "@/components/owner/shop-editor";
 import { StatsPanel } from "@/components/owner/stats-panel";
 import { buttonVariants } from "@/components/ui/button";
@@ -35,9 +36,17 @@ export const Route = createFileRoute("/m/$slug")({
 });
 
 function Owner() {
-	const { shop, rows, today } = Route.useLoaderData();
+	const data = Route.useLoaderData();
 	const { slug } = Route.useParams();
 	const { k } = Route.useSearch();
+	if (!data.ok)
+		return (
+			<Forbidden
+				title="เปิดหน้าจัดการร้านไม่ได้"
+				message="ลิงก์นี้ใช้ไม่ได้ ขอลิงก์ใหม่จากหาเจอทาง LINE"
+			/>
+		);
+	const { shop, rows, today } = data;
 	return (
 		<main className="mx-auto max-w-3xl px-4 py-6">
 			<header className="mb-5 flex flex-wrap items-center justify-between gap-3">

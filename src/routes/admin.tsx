@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { Forbidden } from "@/components/forbidden";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,8 +49,19 @@ const template = JSON.stringify(
 	2,
 );
 
+type ShopList = Extract<
+	Awaited<ReturnType<typeof adminListShops>>,
+	{ ok: true }
+>["shops"];
+
 function Admin() {
-	const shops = Route.useLoaderData();
+	const data = Route.useLoaderData();
+	if (!data.ok)
+		return <Forbidden title="ไม่มีสิทธิ์เข้าหน้านี้" message="ลิงก์ผู้ดูแลไม่ถูกต้อง" />;
+	return <AdminPanel shops={data.shops} />;
+}
+
+function AdminPanel({ shops }: { shops: ShopList }) {
 	const { k } = Route.useSearch();
 	const router = useRouter();
 	const [slug, setSlug] = useState("");
