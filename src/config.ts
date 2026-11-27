@@ -6,3 +6,14 @@ export const contact = {
 	facebook: "https://www.facebook.com/profile.php?id=61596774640090", // Facebook page URL
 	email: "", // business email only, never a personal one
 };
+
+// Launch promo: ฿1,000 off the two setup packages. It switches itself off when slotsLeft
+// reaches 0 or endsAt passes, and the site then shows regular prices.
+// Each time a shop pays its deposit: lower slotsLeft by 1 and push.
+export const promo = {
+	discount: 1000,
+	slotsTotal: 5,
+	slotsLeft: 5,
+	endsAt: "2026-12-31T23:59:59+07:00",
+	endsLabel: "31 ธ.ค. 2569",
+};

@@ -26,8 +26,9 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { GridPattern } from "@/components/ui/grid-pattern";
-import { contact } from "@/config";
+import { contact, promo } from "@/config";
 import { contactHref, greeting, lineHref, messengerHref } from "@/lib/contact";
+import { baht, priceNow, promoActive } from "@/lib/promo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -147,10 +148,9 @@ const plans = [
 	{
 		name: "หาเจอ + ทักไลน์",
 		desc: "Google Maps + LINE OA",
-		price: "1,990",
+		regular: 2990,
+		discountable: true,
 		unit: "บาท",
-		was: "2,990",
-		plan: "หาเจอ + ทักไลน์ 1,990",
 		cta: "เลือกแพ็กนี้",
 		items: [
 			"โปรไฟล์ Google Maps ครบทุกช่อง",
@@ -163,10 +163,9 @@ const plans = [
 	{
 		name: "ครบชุด + เว็บร้าน",
 		desc: "ทุกอย่างในแพ็กแรก + เว็บไซต์ร้าน",
-		price: "3,990",
+		regular: 4990,
+		discountable: true,
 		unit: "บาท",
-		was: "4,990",
-		plan: "ครบชุด + เว็บร้าน 3,990",
 		cta: "เลือกแพ็กนี้",
 		featured: true,
 		items: [
@@ -180,9 +179,9 @@ const plans = [
 	{
 		name: "ดูแลรายเดือน",
 		desc: "เพิ่มได้หลังทำแพ็กไหนก็ได้ ยกเลิกได้ทุกเมื่อ",
-		price: "490",
+		regular: 490,
+		discountable: false,
 		unit: "บาท / เดือน",
-		plan: "ดูแลรายเดือน 490",
 		cta: "สอบถาม",
 		items: [
 			"แก้เมนู ราคา เวลาเปิด วันหยุด ไม่จำกัด ส่งทาง LINE",
@@ -279,8 +278,25 @@ function ContactButtons() {
 }
 
 function Home() {
+	const on = promoActive(promo);
+	const from = priceNow(plans[0].regular, true, promo);
 	return (
 		<>
+			{on && (
+				<div className="bg-primary px-6 py-2 text-center text-sm text-primary-foreground">
+					<span className="font-semibold">
+						โปรเปิดตัว ลด {baht(promo.discount)} บาท
+					</span>{" "}
+					แพ็กตั้งค่าทุกแพ็ก สำหรับ {promo.slotsTotal} ร้านแรก เหลืออีก {promo.slotsLeft}{" "}
+					ที่ ถึง {promo.endsLabel}{" "}
+					<ContactLink
+						plan="โปรเปิดตัว"
+						className="font-semibold underline underline-offset-4"
+					>
+						จองสิทธิ์
+					</ContactLink>
+				</div>
+			)}
 			<header className="sticky top-0 z-20 border-b bg-background/85 backdrop-blur-md">
 				<div className="mx-auto flex h-15 max-w-6xl items-center justify-between px-6">
 					<a
@@ -320,7 +336,9 @@ function Home() {
 						<div>
 							<Badge variant="outline" className="h-6 bg-background px-2.5">
 								<span className="size-1.5 rounded-full bg-emerald-500" />
-								ราคาเปิดตัว สำหรับ 5 ร้านแรก
+								{on
+									? `ลด ${baht(promo.discount)} บาท สำหรับ ${promo.slotsTotal} ร้านแรก เหลือ ${promo.slotsLeft} ที่`
+									: "เช็กร้านฟรี ไม่มีค่าใช้จ่าย"}
 							</Badge>
 							<h1 className="mt-5 text-4xl leading-[1.2] font-bold tracking-tight text-balance md:text-5xl lg:text-6xl">
 								ให้ลูกค้าหาร้านคุณเจอบน Google Maps
@@ -341,7 +359,11 @@ function Home() {
 								</a>
 							</div>
 							<Checks
-								items={["เริ่ม 1,990 บาท", "เสร็จใน 48 ชั่วโมง", "เห็นตัวอย่างก่อนจ่าย"]}
+								items={[
+									`เริ่ม ${baht(from)} บาท`,
+									"เสร็จใน 48 ชั่วโมง",
+									"เห็นตัวอย่างก่อนจ่าย",
+								]}
 								className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-muted-foreground [&_li]:flex [&_li]:items-center [&_li]:gap-1.5 [&_svg]:mt-0 [&_svg]:text-foreground"
 							/>
 						</div>
@@ -411,48 +433,66 @@ function Home() {
 					<div className="mx-auto max-w-6xl px-6">
 						<SectionHead title="ราคาเดียวจบ ไม่มีรายเดือนบังคับ">
 							มัดจำครึ่งเดียวเมื่อพอใจตัวอย่าง ที่เหลือจ่ายตอนงานเสร็จ ผ่านพร้อมเพย์หรือโอนบัญชี
-							ราคาเปิดตัวสำหรับ 5 ร้านแรกเท่านั้น
+							{on &&
+								` โปรเปิดตัวลด ${baht(promo.discount)} บาท ใช้ได้ถึง ${promo.endsLabel} หรือจนครบ ${promo.slotsTotal} ร้าน`}
 						</SectionHead>
 						<div className="grid gap-5 lg:grid-cols-3">
-							{plans.map((p) => (
-								<Card
-									key={p.name}
-									className={cn(p.featured && "ring-2 ring-primary shadow-xl")}
-								>
-									<CardHeader>
-										<div className="flex items-center justify-between gap-3">
-											<CardTitle className="font-semibold">{p.name}</CardTitle>
-											{p.featured && <Badge>คุ้มที่สุด</Badge>}
-										</div>
-										<CardDescription>{p.desc}</CardDescription>
-										<div className="mt-4 flex items-baseline gap-1.5 tabular-nums">
-											<span className="text-4xl font-bold tracking-tight">
-												{p.price}
-											</span>
-											<span className="text-sm text-muted-foreground">
-												{p.unit}
-											</span>
-											{p.was && (
-												<s className="text-sm text-muted-foreground">{p.was}</s>
-											)}
-										</div>
-									</CardHeader>
-									<CardContent className="flex-1">
-										<Checks items={p.items} className="border-t pt-6" />
-									</CardContent>
-									<CardFooter>
-										<ContactLink
-											plan={p.plan}
-											className={btn({
-												variant: p.featured ? "default" : "outline",
-												className: "w-full",
-											})}
-										>
-											{p.cta}
-										</ContactLink>
-									</CardFooter>
-								</Card>
-							))}
+							{plans.map((p) => {
+								const price = priceNow(p.regular, p.discountable, promo);
+								const deal = price < p.regular;
+								return (
+									<Card
+										key={p.name}
+										className={cn(
+											p.featured && "ring-2 ring-primary shadow-xl",
+										)}
+									>
+										<CardHeader>
+											<div className="flex items-center justify-between gap-3">
+												<CardTitle className="font-semibold">
+													{p.name}
+												</CardTitle>
+												<div className="flex gap-1.5">
+													{deal && (
+														<Badge variant="destructive">
+															ลด {baht(promo.discount)}
+														</Badge>
+													)}
+													{p.featured && <Badge>คุ้มที่สุด</Badge>}
+												</div>
+											</div>
+											<CardDescription>{p.desc}</CardDescription>
+											<div className="mt-4 flex items-baseline gap-1.5 tabular-nums">
+												<span className="text-4xl font-bold tracking-tight">
+													{baht(price)}
+												</span>
+												<span className="text-sm text-muted-foreground">
+													{p.unit}
+												</span>
+												{deal && (
+													<s className="text-sm text-muted-foreground">
+														{baht(p.regular)}
+													</s>
+												)}
+											</div>
+										</CardHeader>
+										<CardContent className="flex-1">
+											<Checks items={p.items} className="border-t pt-6" />
+										</CardContent>
+										<CardFooter>
+											<ContactLink
+												plan={`${p.name} ${baht(price)}${deal ? " (โปรเปิดตัว)" : ""}`}
+												className={btn({
+													variant: p.featured ? "default" : "outline",
+													className: "w-full",
+												})}
+											>
+												{p.cta}
+											</ContactLink>
+										</CardFooter>
+									</Card>
+								);
+							})}
 						</div>
 						<p className="mt-5 text-sm text-muted-foreground">
 							ร้านที่มีลูกค้าต่างชาติ เพิ่มเว็บภาษาอังกฤษได้ +990 บาท
