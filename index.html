@@ -372,7 +372,10 @@ footer{padding:36px 0 110px;color:var(--muted);font-size:14px}
   const msg = (plan) => `สวัสดีครับ ${plan ? 'สนใจแพ็ก ' + plan : 'ขอเช็กร้านฟรี'} ร้านชื่อ: \nลิงก์เพจร้าน (ถ้ามี): `
   // LINE deep link with a pre-filled message to the OA
   const lineHref = (text) => c.line ? `https://line.me/R/oaMessage/${encodeURIComponent(c.line)}/?${encodeURIComponent(text)}` : ''
-  const primaryHref = lineHref(msg()) || (c.facebook ? c.facebook.replace(/\/$/, '').replace('facebook.com', 'm.me') : '') || '#contact'
+  // Messenger link: facebook.com/profile.php?id=N -> m.me/N, facebook.com/name -> m.me/name
+  const mme = (u) => { const url = new URL(u); return 'https://m.me/' + (url.searchParams.get('id') || url.pathname.split('/').filter(Boolean)[0]) }
+  const fbHref = c.facebook ? mme(c.facebook) : ''
+  const primaryHref = lineHref(msg()) || fbHref || '#contact'
 
   document.querySelectorAll('[data-contact]').forEach((a) => {
     const href = a.dataset.contact === 'plan' ? (lineHref(msg(a.dataset.plan)) || primaryHref) : primaryHref
@@ -389,7 +392,7 @@ footer{padding:36px 0 110px;color:var(--muted);font-size:14px}
     list.append(a)
   }
   if (c.line) add(lineHref(msg()), `แชท LINE ${c.line}`, true)
-  if (c.facebook) add(c.facebook.replace(/\/$/, '').replace('facebook.com', 'm.me'), 'ทัก Messenger', !c.line)
+  if (fbHref) add(fbHref, 'ทัก Messenger', !c.line)
   if (c.phone) add(`tel:${c.phone.replace(/[^\d+]/g, '')}`, `โทร ${c.phone}`)
   if (c.email) add(`mailto:${c.email}?subject=${encodeURIComponent('ขอเช็กร้านฟรี')}`, 'ส่งอีเมล')
   if (!list.children.length) list.innerHTML = '<p class="pending-contact">ช่องทางติดต่อกำลังเปิดเร็ว ๆ นี้</p>'
